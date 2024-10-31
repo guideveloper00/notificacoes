@@ -1,0 +1,70 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: 2035
+          MYSQL_DATABASE: notificacoes
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASS: 2035
+      DB_NAME: notificacoes
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+      PORT: 3000
+      SMTP_HOST: bulk.smtp.mailtrap.io
+      SMTP_PORT: 587
+      SMTP_USER: api
+      SMTP_PASS: b0a2c514bf5aed0acadc46d1d41749ff
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Run Tests
+      run: npm run test
+
+    - name: Build Project
+      run: npm run build
+
+    - name: Deploy to Production
+      if: github.ref == 'refs/heads/main' && success()
+      run: |
+        echo "Deploying to production server"
+        # Adicione comandos de deploy aqui, como upload para um servidor
