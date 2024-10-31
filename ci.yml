@@ -20,7 +20,11 @@ jobs:
           MYSQL_DATABASE: notificacoes
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping -h localhost" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: > 
+          --health-cmd="mysqladmin ping -h localhost" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=3
 
       redis:
         image: redis:latest
@@ -29,9 +33,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
+
       - run: npm install
-      - run: npm run test
+
+      - name: Run Tests
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_USER: root
+          DB_PASS: 2035
+          DB_NAME: notificacoes
+          REDIS_HOST: 127.0.0.1
+          REDIS_PORT: 6379
+        run: npm run test

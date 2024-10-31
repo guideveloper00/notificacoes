@@ -5,6 +5,7 @@ import { Task } from './entities/task.entity';
 import { TasksService } from './task.service';
 import { TasksController } from './task.controller';
 import { NotificationsProcessor } from './notifications.processor';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { NotificationsProcessor } from './notifications.processor';
     BullModule.registerQueue({
       name: 'notifications',
     }),
+    EmailModule
   ],
   controllers: [TasksController],
   providers: [TasksService, NotificationsProcessor],

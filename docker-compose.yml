@@ -1,9 +1,22 @@
 version: '3.8'
+
 services:
   app:
     build: .
     ports:
       - '3000:3000'
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASS: 2035
+      DB_NAME: notificacoes
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SMTP_HOST: sandbox.smtp.mailtrap.io
+      SMTP_PORT: 2525
+      SMTP_USER: d54c9d25be625e
+      SMTP_PASS: 8a0214ad368ece
     depends_on:
       - db
       - redis
@@ -14,9 +27,13 @@ services:
       MYSQL_ROOT_PASSWORD: 2035
       MYSQL_DATABASE: notificacoes
     ports:
-      - '3306:3306'
-
+      - '3307:3306'
+    volumes:
+      - db_data:/var/lib/mysql
   redis:
     image: redis:latest
     ports:
       - '6379:6379'
+
+volumes:
+  db_data:

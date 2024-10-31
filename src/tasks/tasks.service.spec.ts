@@ -47,14 +47,16 @@ describe('TasksService', () => {
     it('deve criar uma nova tarefa', async () => {
       const title = 'Test Task';
       const description = 'Test Description';
-      const task = { id: 1, title, description, isCompleted: false };
+      const email = 'teste@hotmail.com';
+
+      const task = { id: 1, title, description, email, isCompleted: false };
 
       jest.spyOn(tasksRepository, 'create').mockReturnValue(task as any);
       jest.spyOn(tasksRepository, 'save').mockResolvedValue(task as any);
 
-      const result = await service.create(title, description);
+      const result = await service.create(title, description, email);
 
-      expect(tasksRepository.create).toHaveBeenCalledWith({ title, description });
+      expect(tasksRepository.create).toHaveBeenCalledWith({ title, description, email });
       expect(tasksRepository.save).toHaveBeenCalledWith(task);
       expect(result).toEqual(task);
     });
@@ -74,7 +76,7 @@ describe('TasksService', () => {
 
   describe('markAsCompleted', () => {
     it('deve marcar a tarefa como completa e enviar uma notificação', async () => {
-      const task = { id: 1, title: 'Test Task', description: 'Test Description', isCompleted: false };
+      const task = { id: 1, title: 'Test Task', description: 'Test Description', isCompleted: false, email: 'teste@hotmail.com' };
       jest.spyOn(tasksRepository, 'findOne').mockResolvedValue(task as any);
       jest.spyOn(tasksRepository, 'save').mockResolvedValue({ ...task, isCompleted: true } as any);
       jest.spyOn(notificationsQueue, 'add').mockResolvedValue(undefined as any);
@@ -85,7 +87,7 @@ describe('TasksService', () => {
       expect(tasksRepository.save).toHaveBeenCalledWith({ ...task, isCompleted: true });
       expect(notificationsQueue.add).toHaveBeenCalledWith('send-notification', {
         taskId: task.id,
-        email: 'user@example.com',
+        email: task.email
       });
     });
   });

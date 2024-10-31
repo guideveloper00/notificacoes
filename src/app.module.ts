@@ -4,28 +4,30 @@ import { BullModule } from '@nestjs/bull';
 import { TasksModule } from './tasks/task.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '2035',
-      database: 'notificacoes',
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT, 10) || 3306,
+      username: process.env.DB_USER || 'root',
+      password: process.env.DB_PASS || '2035',
+      database: process.env.DB_NAME || 'notificacoes',
       autoLoadEntities: true,
       synchronize: true,
     }),
     BullModule.forRoot({
       redis: {
-        host: 'localhost',
-        port: 6379,
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT, 10) || 6379,
       },
     }),
     BullModule.registerQueue({
       name: 'notifications',
     }),
+    EmailModule,
     TasksModule,
   ],
   controllers: [AppController],

@@ -1,31 +1,45 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsProcessor } from './notifications.processor';
+import { EmailService } from '../email/email.service';
 import { Job } from 'bull';
 
 describe('NotificationsProcessor', () => {
   let processor: NotificationsProcessor;
+  let emailService: EmailService;
 
   beforeEach(async () => {
+    const mockEmailService = {
+      sendEmail: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
-      providers: [NotificationsProcessor],
+      providers: [
+        NotificationsProcessor,
+        {
+          provide: EmailService,
+          useValue: mockEmailService,
+        },
+      ],
     }).compile();
 
     processor = module.get<NotificationsProcessor>(NotificationsProcessor);
+    emailService = module.get<EmailService>(EmailService);
   });
 
-  it('deve processar a notificação e imprimir no console', async () => {
-    const consoleSpy = jest.spyOn(console, 'log');
+  it('deve processar a notificação e chamar o sendEmail', async () => {
     const job: Job = {
       data: {
-        taskId: 1,
         email: 'user@example.com',
+        taskId: 1,
       },
     } as any;
 
     await processor.handleNotification(job);
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Notificação de tarefa 1 enviada para o e-mail: user@example.com',
+    expect(emailService.sendEmail).toHaveBeenCalledWith(
+      'user@example.com',
+      'Tarefa Concluída',
+      'A tarefa 1 foi marcada como concluída.'
     );
   });
 });
