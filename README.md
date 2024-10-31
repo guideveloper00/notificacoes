@@ -41,6 +41,10 @@ GET /tasks: Lista todas as tarefas.
 PUT /tasks/:id: Marca uma tarefa como concluída.
 DELETE /tasks/:id: Exclui uma tarefa.
 
+## API Teste
+
+Insomnia
+
 ## Description
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
