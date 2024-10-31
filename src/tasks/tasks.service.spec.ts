@@ -4,7 +4,7 @@ import { TasksService } from './task.service';
 import { Task } from './entities/task.entity';
 import { Queue } from 'bull';
 import { getQueueToken } from '@nestjs/bull';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 
 describe('TasksService', () => {
   let service: TasksService;
@@ -29,6 +29,19 @@ describe('TasksService', () => {
           provide: getQueueToken('notifications'),
           useValue: {
             add: jest.fn(),
+          },
+        },
+        {
+          provide: DataSource,
+          useValue: {
+            createQueryRunner: jest.fn().mockReturnValue({
+              connect: jest.fn(),
+              release: jest.fn(),
+              query: jest.fn(),
+              startTransaction: jest.fn(),
+              commitTransaction: jest.fn(),
+              rollbackTransaction: jest.fn(),
+            }),
           },
         },
       ],
@@ -94,7 +107,7 @@ describe('TasksService', () => {
 
   describe('delete', () => {
     it('deve deletar uma tarefa', async () => {
-      jest.spyOn(tasksRepository, 'delete').mockResolvedValue(undefined as any);
+      jest.spyOn(tasksRepository, 'delete').mockResolvedValue({ affected: 1 } as any);
 
       await service.delete(1);
 
