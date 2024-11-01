@@ -45,6 +45,13 @@ DELETE /tasks/:id: Exclui uma tarefa.
 
 Insomnia
 
+Exemplo de payload:
+{
+  "title": "Minha Tarefa",
+  "description": "Descrição da tarefa",
+	"email": "teste@hotmail.com"
+}
+
 ## Description
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
